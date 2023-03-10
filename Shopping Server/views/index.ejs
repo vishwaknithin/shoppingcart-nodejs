@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grootan</title>
+
+    <link rel="stylesheet" href="../css/grootan.css">
+    <link rel="stylesheet" href="../css/index.css">
+
+    <script src="https://kit.fontawesome.com/08c3f952c9.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js" integrity="sha512-pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="fluid center">
+    <div>
+    <div class="card">
+        <div class="card-body">
+        <div class="row">
+        <div class="col-8" style="display: flex;align-items: center;justify-content: start;"><h3><%=userInfo.mail%></h3></div>
+        <div class="col-4" style="display: flex;align-items: center;justify-content: end;">
+            <form method="post"><button class="btn btn-danger" name="logout" type="submit">Logout</button></form>
+        </div>
+        </div>
+        </div>
+    </div>
+    <div class="products">
+        <%for(let i = 0; i < products.length; i++){%>
+        <div class="card" style="width: 19rem;margin:20px;">
+            <div style="width:100%;height:400px;">
+                <img src="<%=products[i].image%>" class="card-img-top" style="width:100%" alt="...">
+            </div>
+            <hr>
+            <div class="card-body">
+                <h5 class="card-title"><%=products[i].name%></h5>
+                <p class="card-text"><%=products[i].description%></p>
+                <p class="card-text text-muted"><i class="fa-solid fa-star"></i><%=products[i].rating%></p>
+                <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop<%=products[i].name%>">View</a>
+                
+            </div>
+        </div>
+        <%}%>
+    </div>
+    </div>
+</div>
+
+<%for(let i = 0; i < products.length; i++){%>
+<div class="modal fade" id="staticBackdrop<%=products[i].name%>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel"><%=products[i].name%></h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="close<%=products[i].name%>"></button>
+        </div>
+        <div class="modal-body">
+        <div style="display:flex">
+            <div class="img-container">
+                <img src="<%=products[i].image%>" style="width:100%"/>
+            </div>
+            <div style="width:100%">
+                <h1><%=products[i].name%></h1>
+                <p><%=products[i].description%></p>
+                <hr>
+                <h5><i class="fa-solid fa-star"></i><%=products[i].rating%> Ratings</h5>
+                <h1>₹<%=products[i].price%></h1>
+                <br>
+                <br>
+                <div id="ordering<%=products[i].name%>" class="ordering">
+                    <hr>
+                    <div class="alert alert-secondary" role="alert">
+                    <div class="row">
+                        <div class="col-8"> <i class="fa-regular fa-credit-card"></i> Complete Your CheckOut To Continue! </div>
+                        <div class="col-4" style="display: flex; align-items: center; justify-content: end;"> <button class="btn btn-danger btn-sm" style="align-items: end;">Decline</button> </div>
+                    </div>
+                    </div>
+                    <p id="redirectText<%=products[i].name%>" class="text-muted">You Will Be Redirected Soon!</p>
+                    
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="back<%=products[i].name%>" data-bs-dismiss="modal"><i class="fa-solid fa-chevron-left"></i> Back</button>
+          <button type="button" class="btn btn-primary" id="order<%=products[i].name%>"><i class="fa-solid fa-truck-fast"></i> Order</button>
+        </div>
+      </div>
+    </div>
+</div>
+<script>
+    $( "#order<%=products[i].name%>" ).click(function() {
+        $('#order<%=products[i].name%>').prop('disabled', true);
+        $('#close<%=products[i].name%>').prop('disabled', true);
+        $('#back<%=products[i].name%>').prop('disabled', true);
+
+        $('#ordering<%=products[i].name%>').css('opacity', 1);
+    
+        $.post("../",{
+            order:true,
+            mail: "<%=userInfo.mail%>",
+            product_name: "<%=products[i].name%>",
+            product_id: "<%=products[i].id%>",
+            product_quantity: 1,
+            product_price: "<%=products[i].price%>",
+        },function(data, status){
+            
+            window.open(`../order/${data}`);
+            $("#redirectText<%=products[i].name%>").css('opacity', 0);
+
+            let hash = data;
+            const loop = setInterval(()=>{
+            $.post("../",{
+                getOrderStatus:true,
+                hash: data
+            },function(data, status){
+                
+                if(parseInt(data) == 1){
+                    $("#ordering<%=products[i].name%>").empty();
+                    $("#ordering<%=products[i].name%>").html (`
+                    <div class="alert alert-success" role="alert">
+                            Order Placed SuccessFully!<br>
+                            <span class="text-muted" style="font-size:13px;">#${hash}</span>
+                    </div>
+                    `);
+                    $('#order<%=products[i].name%>').remove();
+                    $('#close<%=products[i].name%>').prop('disabled', false);
+                    $('#back<%=products[i].name%>').prop('disabled', false);
+                }else if(parseInt(data) == 2){
+                    $("#ordering<%=products[i].name%>").empty();
+                    $("#ordering<%=products[i].name%>").html( `
+                    <div class="alert alert-danger" role="alert">
+                            Order Failed!<br>
+                    </div>
+                    `);
+                    $('#order<%=products[i].name%>').remove();
+                    $('#close<%=products[i].name%>').prop('disabled', false);
+                    $('#back<%=products[i].name%>').prop('disabled', false);
+                }
+            });
+        },1000);
+        });
+    });
+</script>
+<%}%>
+</body>
+</html>

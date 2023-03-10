@@ -1,0 +1,16 @@
+.center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fluid{
+    width:100vw;
+    height:100vh;
+}
+
+img{
+    flex-shrink: 0;
+    min-width: 100%;
+    min-height: 100%;
+}
